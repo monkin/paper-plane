@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Paper Plane</title>
+    <style>
+        html, body, #container {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+<div id="container">
+    <canvas id="canvas"></canvas>
+</div>
+<script type="module">
+    import init, {Plane} from "./pkg/wasm_plane.js";
+
+    await init();
+
+    function nextFrame() {
+        return new Promise(resolve => requestAnimationFrame(resolve));
+    }
+
+    const container = document.getElementById("container");
+    const canvas = document.getElementById("canvas");
+    const plane = new Plane(canvas);
+
+    function resize() {
+        const w = container.clientWidth;
+        const h = container.clientHeight;
+        if (canvas.clientWidth !== w || canvas.clientHeight !== h) {
+            canvas.style.width = `${w}px`;
+            canvas.style.height = `${h}px`;
+            canvas.width = w * devicePixelRatio;
+            canvas.height = h * devicePixelRatio;
+        }
+    }
+
+    function resizeWithDelay() {
+        resize();
+        setTimeout(resize, 200);
+    }
+
+    window.addEventListener('resize', resizeWithDelay);
+    window.addEventListener('orientationchange', resizeWithDelay);
+    resizeWithDelay();
+
+    while (true) {
+        const w = container.clientWidth * devicePixelRatio;
+        const h = container.clientHeight * devicePixelRatio;
+        plane.render(w, h, performance.now() / 20000 % 1.0);
+        await nextFrame();
+    }
+</script>
+</body>
+</html>
