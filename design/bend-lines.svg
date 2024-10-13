@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<svg
+        width="210mm"
+        height="297mm"
+        viewBox="0,0,210,297"
+        preserveAspectRatio="none"
+        xmlns="http://www.w3.org/2000/svg"
+        xmlns:xlink="http://www.w3.org/1999/xlink"
+>
+    <g id="side" stroke="black" stroke-width="0.2" transform="translate(105, 0)">
+        <rect fill="none" x="0.2" y="0.2" width="104.6" height="296.6" stroke-opacity="0.5"
+              stroke-width="0.4"
+              stroke-dasharray="1 1"/>
+        <line x1="0" y1="0" x2="0" y2="105"/>
+        <line x1="0" y1="105" x2="0" y2="297"/>
+        <line x1="0" y1="105" x2="105" y2="105"/>
+        <line x1="0" y1="0" x2="105" y2="105"/>
+
+        <line x1="13" y1="105" x2="105" y2="211.064"/>
+
+        <line x1="13" y1="105" x2="55.733" y2="55.733"/>
+        <line x1="55.733" y1="55.733" x2="105" y2="13"/>
+
+        <line x1="13" y1="0" x2="13" y2="13"/>
+        <line x1="0" y1="13" x2="13" y2="13"/>
+
+        <line x1="6.5" y1="105" x2="55" y2="297"/>
+        <line x1="6.5" y1="105" x2="26.3638" y2="26.3638"/>
+        <line x1="26.3638" y1="26.3638" x2="105" y2="6.5"/>
+
+        <line x1="29.608" y1="105" x2="105" y2="135.92"/>
+        <line x1="29.608" y1="105" x2="83.073" y2="83.073"/>
+        <line x1="83.073" y1="83.073" x2="105" y2="29.608"/>
+
+        <g fill="#FF0000" opacity="0.85">
+            <circle id="c0" cx="0" cy="0" r="1.5"/>
+            <circle id="c1" cx="0" cy="105" r="1.5"/>
+            <circle id="c2" cx="105" cy="0" r="1.5"/>
+            <circle id="c3" cx="105" cy="105" r="1.5"/>
+            <circle id="c4" cx="0" cy="297" r="1.5"/>
+            <circle id="c5" cx="13" cy="105" r="1.5"/>
+            <circle id="c6" cx="105" cy="211.064" r="1.5"/>
+            <circle id="c7" cx="55.733" cy="55.733" r="1.5"/>
+            <circle id="c8" cx="13" cy="0" r="1.5"/>
+            <circle id="c9" cx="13" cy="13" r="1.5"/>
+            <circle id="c10" cx="0" cy="13" r="1.5"/>
+            <circle id="c11" cx="6.5" cy="105" r="1.5"/>
+            <circle id="c12" cx="55" cy="297" r="1.5"/>
+            <circle id="c13" cx="26.3638" cy="26.3638" r="1.5"/>
+            <circle id="c14" cx="105" cy="6.5" r="1.5"/>
+            <circle id="c15" cx="29.608" cy="105" r="1.5"/>
+            <circle id="c16" cx="105" cy="135.92" r="1.5"/>
+            <circle id="c17" cx="83.073" cy="83.073" r="1.5"/>
+            <circle id="c18" cx="105" cy="29.608" r="1.5"/>
+            <circle id="c19" cx="105" cy="13" r="1.5"/>
+            <circle id="c20" cx="105" cy="297" r="1.5"/>
+        </g>
+    </g>
+
+    <use xlink:href="#side" transform="matrix(-1 0 0 1 210 0)"/>
+
+    <g
+            transform="translate(108, 4)"
+            text-anchor="middle"
+            stroke-width="0.2"
+            stroke="white"
+            font-family="monospace"
+            font-size="4"
+            font-weight="bold"
+    >
+        <text x="0" y="0">0</text>
+        <text x="0" y="105">1</text>
+        <text x="100" y="0">2</text>
+        <text x="100" y="105">3</text>
+        <text x="0" y="290">4</text>
+        <text x="13" y="105">5</text>
+        <text x="100" y="211.064">6</text>
+        <text x="55.733" y="55.733">7</text>
+        <text x="13" y="0">8</text>
+        <text x="13" y="13">9</text>
+        <text x="0" y="13">10</text>
+        <text x="6.5" y="105">11</text>
+        <text x="55" y="290">12</text>
+        <text x="26.3638" y="26.3638">13</text>
+        <text x="98" y="6.5">14</text>
+        <text x="29.608" y="105">15</text>
+        <text x="98" y="135.92">16</text>
+        <text x="83.073" y="83.073">17</text>
+        <text x="98" y="29.608">18</text>
+        <text x="98" y="13">19</text>
+        <text x="98" y="290">20</text>
+    </g>
+</svg>
