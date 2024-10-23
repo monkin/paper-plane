@@ -50,6 +50,7 @@
     window.addEventListener('orientationchange', resizeWithDelay);
     resizeWithDelay();
 
+    // noinspection InfiniteLoopJS
     while (true) {
         const w = container.clientWidth * devicePixelRatio;
         const h = container.clientHeight * devicePixelRatio;

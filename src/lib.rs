@@ -56,13 +56,13 @@ impl Plane {
     pub fn render(&self, w: i32, h: i32, phase: f32) {
         let ratio = (w as f32) / (h as f32);
         let camera = Camera {
-            position: Vec3::new(4.0, -6.0, 5.0),
+            position: Vec3::new(1.0, 1.0, -15.0),
             target: Vec3::new(0.0, 0.0, 0.0),
             fov: 80.0 / (2.0 * PI),
-            width: 2.0 * ratio,
-            height: 2.0 / ratio,
-            far: 3.0,
-            near: -3.0,
+            width: 3.0,
+            height: 3.0 * ratio,
+            far: 4.0,
+            near: -4.0,
         };
         self.gl.apply(
             Gl::settings()

@@ -81,7 +81,7 @@ mod tests {
         let v2 = round(fold.apply(&points, 1.0)[2]);
 
         assert_eq!(v0, Vec3::new(0.0, 1.0, 0.0));
-        assert_eq!(v1, Vec3::new(0.0, 0.703125, 0.703125));
+        assert_eq!(v1, Vec3::new(0.0, 0.7109375, 0.7109375));
         assert_eq!(v2, Vec3::new(0.0, 0.0, 1.0));
     }
 
