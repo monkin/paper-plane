@@ -6,6 +6,7 @@ use crate::bit_set::BitSet;
 use crate::fold::Fold;
 
 const SCALE: f32 = 1.0 / 297.0;
+const FOLD_FACTOR: f32 = 0.97;
 
 static POINTS: &[(f32, f32)] = &[
     (0.0, 0.0),
@@ -73,7 +74,7 @@ static STEPS: &[Step] = &[
         transformation: Fold::new(
             (0, 4),
             BitSet::with_bits(&[2, 3, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]),
-            PI * 0.5,
+            PI * 0.5 * FOLD_FACTOR,
         ),
         lines: &[
             (0, 10),
@@ -99,7 +100,7 @@ static STEPS: &[Step] = &[
             BitSet::with_bits(&[
                 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
             ]),
-            -PI * 0.5,
+            -PI * 0.5 * FOLD_FACTOR,
         ),
         lines: &[],
     },
@@ -113,18 +114,18 @@ static STEPS: &[Step] = &[
         transformation: Fold::new(
             (1, 3),
             BitSet::with_bits(&[0, 8, 2, 14, 19, 18, 9, 13, 7, 17, 10]),
-            -PI,
+            PI,
         ),
         lines: &[(1, 11), (11, 5), (5, 15), (15, 3)],
     },
     Step {
         duration: 1.0,
-        transformation: Fold::new((5, 6), BitSet::with_bits(&[18, 17, 3, 15, 16]), -PI),
+        transformation: Fold::new((5, 6), BitSet::with_bits(&[18, 17, 3, 15, 16]), PI),
         lines: &[(5, 6), (5, 7), (7, 19)],
     },
     Step {
         duration: 1.0,
-        transformation: Fold::new((9, 10), BitSet::with_bits(&[0]), -PI),
+        transformation: Fold::new((9, 10), BitSet::with_bits(&[0]), PI),
         lines: &[(9, 10), (9, 8)],
     },
     Step {
@@ -132,14 +133,19 @@ static STEPS: &[Step] = &[
         transformation: Fold::new(
             (1, 4),
             BitSet::with_bits(&[2, 3, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]),
-            -PI * 0.5,
+            -PI * 0.5 * FOLD_FACTOR,
         ),
         lines: &[],
     },
     Step {
         duration: 1.0,
-        transformation: Fold::new((11, 12), BitSet::with_bits(&[5, 7, 19, 6, 20]), -PI * 0.5),
+        transformation: Fold::new((11, 12), BitSet::with_bits(&[5, 7, 19, 6, 20]), PI * 0.5),
         lines: &[(11, 12), (11, 13), (13, 14), (15, 16), (15, 17), (17, 18)],
+    },
+    Step {
+        duration: 3.0,
+        transformation: Fold::new((1, 4), BitSet::with_bits(&[]), 0.0),
+        lines: &[],
     },
 ];
 

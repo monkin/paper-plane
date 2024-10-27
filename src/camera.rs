@@ -13,11 +13,15 @@ pub struct Camera {
 
 impl Camera {
     pub fn get_matrix(&self) -> Mat4 {
-        let v = (self.target - self.position).normalize();
-        let up = Vec3::new(-v.z, -v.y, v.x);
+        self.get_projection_matrix() * self.get_view_matrix()
+    }
 
+    pub fn get_view_matrix(&self) -> Mat4 {
+        look_at(&self.position, &self.target, &Vec3::new(0.0, 1.0, 0.0))
+    }
+
+    pub fn get_projection_matrix(&self) -> Mat4 {
         perspective_fov_zo(self.fov, self.width, self.height, self.near, self.far)
-            * look_at(&self.position, &self.target, &up)
     }
 }
 

@@ -1,13 +1,12 @@
 use std::iter::once;
 
+use crate::plane_geometry::{PlaneGeometry, PlanePrimitives};
+use crate::scene::Scene;
 use glm::{Mat4, Vec3};
 use webgl_rc::{
-    Attributes, BufferUsage, Gl, GlError, Instances, ItemsBuffer, load_glsl, PrimitiveType,
-    Program, Uniforms,
+    load_glsl, Attributes, BufferUsage, CullFace, DepthFunction, Gl, GlError, Instances,
+    ItemsBuffer, PrimitiveType, Program, Settings, Uniforms,
 };
-
-use crate::camera::Camera;
-use crate::plane_geometry::{PlaneGeometry, PlanePrimitives};
 
 #[derive(Clone, Debug)]
 pub struct PlaneProgram {
@@ -34,6 +33,12 @@ struct SideAttribute {
 #[derive(Clone, Copy, PartialEq, Debug, Uniforms)]
 struct LineUniforms {
     camera: Mat4,
+}
+
+#[derive(Clone, Copy, PartialEq, Debug, Uniforms)]
+struct TriangleUniforms {
+    camera: Mat4,
+    light_position: Vec3,
 }
 
 #[derive(Clone, Copy, PartialEq, Debug, Attributes)]
@@ -74,7 +79,34 @@ impl PlaneProgram {
         })
     }
 
-    pub fn draw(&self, camera: &Camera, primitives: &PlanePrimitives) {
+    pub fn draw(&self, scene: &Scene, primitives: &PlanePrimitives) {
+        let camera = &scene.camera;
+        let light_position = scene.light_position;
+
+        let triangles: Vec<_> = primitives
+            .triangles
+            .iter()
+            .copied()
+            .flat_map(|(p1, p2, p3)| {
+                let normal: Vec3 = (p2 - p1).cross(&(p3 - p1)).normalize();
+                once(TriangleVertex {
+                    position: p1,
+                    normal,
+                })
+                .chain(once(TriangleVertex {
+                    position: p2,
+                    normal,
+                }))
+                .chain(once(TriangleVertex {
+                    position: p3,
+                    normal,
+                }))
+            })
+            .collect();
+
+        self.triangles_array
+            .set_content(&triangles, BufferUsage::Dynamic);
+
         let lines: Vec<_> = primitives
             .lines
             .iter()
@@ -92,6 +124,25 @@ impl PlaneProgram {
             .collect();
 
         self.lines_array.set_content(&lines, BufferUsage::Dynamic);
+
+        self.gl.apply(
+            Gl::settings()
+                .depth_test(true)
+                .depth_function(DepthFunction::LEqual)
+                .cull_face(CullFace::FrontAndBack),
+            || {
+                self.triangles_program.draw_instances(
+                    PrimitiveType::Triangles,
+                    &TriangleUniforms {
+                        camera: camera.get_matrix(),
+                        light_position,
+                    },
+                    &self.triangles_array,
+                    &self.sides_array,
+                );
+            },
+        );
+
         self.lines_program.draw_instances(
             PrimitiveType::Lines,
             &LineUniforms {
