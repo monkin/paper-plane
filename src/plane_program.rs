@@ -1,14 +1,14 @@
 use std::iter::once;
 
-use crate::plane_geometry::{PlaneGeometry, PlanePrimitives};
+use crate::model::Model;
+use crate::plane_geometry::PlaneGeometry;
 use crate::scene::Scene;
 use glm::{Mat4, Vec3};
 use webgl_rc::{
-    load_glsl, Attributes, BufferUsage, CullFace, DepthFunction, Gl, GlError, Instances,
+    load_glsl, Attributes, BlendFunction, BufferUsage, CullFace, DepthFunction, Gl, GlError,
     ItemsBuffer, PrimitiveType, Program, Settings, Uniforms,
 };
 
-#[derive(Clone, Debug)]
 pub struct PlaneProgram {
     gl: Gl,
     geometry: PlaneGeometry,
@@ -16,18 +16,12 @@ pub struct PlaneProgram {
     lines_program: Program,
     lines_array: ItemsBuffer<LineVertex>,
     triangles_array: ItemsBuffer<TriangleVertex>,
-    sides_array: ItemsBuffer<SideAttribute>,
 }
 
 #[derive(Clone, Copy, PartialEq, Debug, Attributes)]
 struct LineVertex {
     position: Vec3,
     opacity: f32,
-}
-
-#[derive(Clone, Copy, PartialEq, Debug, Instances)]
-struct SideAttribute {
-    side: f32,
 }
 
 #[derive(Clone, Copy, PartialEq, Debug, Uniforms)]
@@ -63,10 +57,6 @@ impl PlaneProgram {
         let triangles_array: ItemsBuffer<TriangleVertex> =
             gl.items_buffer(&[], BufferUsage::Dynamic)?;
         let lines_array: ItemsBuffer<LineVertex> = gl.items_buffer(&[], BufferUsage::Dynamic)?;
-        let sides_array = gl.items_buffer(
-            &vec![SideAttribute { side: 1.0 }, SideAttribute { side: -1.0 }],
-            BufferUsage::Dynamic,
-        )?;
 
         Ok(PlaneProgram {
             gl,
@@ -75,18 +65,23 @@ impl PlaneProgram {
             triangles_program,
             lines_array,
             triangles_array,
-            sides_array,
         })
     }
 
-    pub fn draw(&self, scene: &Scene, primitives: &PlanePrimitives) {
+    pub fn draw(&self, scene: &Scene, model: &Model) {
         let camera = &scene.camera;
         let light_position = scene.light_position;
 
-        let triangles: Vec<_> = primitives
+        let triangles: Vec<_> = model
             .triangles
             .iter()
             .copied()
+            .map(|(a, b, c)| {
+                let p1 = model.vertices[a as usize];
+                let p2 = model.vertices[b as usize];
+                let p3 = model.vertices[c as usize];
+                (p1, p2, p3)
+            })
             .flat_map(|(p1, p2, p3)| {
                 let normal: Vec3 = (p2 - p1).cross(&(p3 - p1)).normalize();
                 once(TriangleVertex {
@@ -107,17 +102,17 @@ impl PlaneProgram {
         self.triangles_array
             .set_content(&triangles, BufferUsage::Dynamic);
 
-        let lines: Vec<_> = primitives
+        let lines: Vec<_> = model
             .lines
             .iter()
             .copied()
             .flat_map(|(p1, p2, a)| {
                 once(LineVertex {
-                    position: p1,
+                    position: model.vertices[p1 as usize],
                     opacity: a,
                 })
                 .chain(once(LineVertex {
-                    position: p2,
+                    position: model.vertices[p2 as usize],
                     opacity: a,
                 }))
             })
@@ -131,25 +126,33 @@ impl PlaneProgram {
                 .depth_function(DepthFunction::LEqual)
                 .cull_face(CullFace::FrontAndBack),
             || {
-                self.triangles_program.draw_instances(
+                self.triangles_program.draw_arrays(
                     PrimitiveType::Triangles,
                     &TriangleUniforms {
                         camera: camera.get_matrix(),
                         light_position,
                     },
                     &self.triangles_array,
-                    &self.sides_array,
                 );
             },
         );
 
-        self.lines_program.draw_instances(
-            PrimitiveType::Lines,
-            &LineUniforms {
-                camera: camera.get_matrix(),
+        self.gl.apply(
+            Gl::settings().depth_test(false).blend(true).blend_function(
+                BlendFunction::One,
+                BlendFunction::OneMinusSrcAlpha,
+                BlendFunction::One,
+                BlendFunction::OneMinusSrcAlpha,
+            ),
+            || {
+                self.lines_program.draw_arrays(
+                    PrimitiveType::Lines,
+                    &LineUniforms {
+                        camera: camera.get_matrix(),
+                    },
+                    &self.lines_array,
+                );
             },
-            &self.lines_array,
-            &self.sides_array,
         );
     }
 }

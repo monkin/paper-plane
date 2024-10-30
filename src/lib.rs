@@ -7,7 +7,7 @@ use std::f32::consts::PI;
 use glm::Vec3;
 use wasm_bindgen::prelude::*;
 use web_sys::HtmlCanvasElement;
-use webgl_rc::{Gl, GlError, Item, Settings};
+use webgl_rc::{Gl, GlError, Settings};
 
 use crate::camera::Camera;
 use crate::plane_geometry::PlaneGeometry;
@@ -19,8 +19,8 @@ mod bezier;
 mod bit_set;
 mod camera;
 mod flight;
-mod fold;
 mod mix;
+mod model;
 mod plane_geometry;
 mod plane_program;
 mod scene;
@@ -28,7 +28,7 @@ mod utils;
 
 const DURATION: f64 = 6000.0;
 
-const LIGHT_POSITION: Vec3 = Vec3::new(2.0, 10.0, -5.0);
+const LIGHT_POSITION: Vec3 = Vec3::new(2.0, 5.0, -5.0);
 
 #[wasm_bindgen(start)]
 pub fn start() {
@@ -66,7 +66,7 @@ impl Plane {
                 fov: 43.0 / (2.0 * PI),
                 width: 2.0,
                 height: 2.0 / ratio,
-                far: 200.0,
+                far: 100.0,
                 near: 0.01,
             },
             LIGHT_POSITION,
@@ -80,7 +80,7 @@ impl Plane {
             || {
                 self.gl.clear_buffers();
                 self.plane_program
-                    .draw(&scene, &self.plane_geometry.get_primitives(phase))
+                    .draw(&scene, &self.plane_geometry.get_model(phase))
             },
         );
     }

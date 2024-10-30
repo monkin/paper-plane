@@ -1,9 +1,10 @@
+use crate::model::transform::Transform;
 use std::f32::consts::PI;
 
-use glm::Vec3;
-
 use crate::bit_set::BitSet;
-use crate::fold::Fold;
+use crate::model::transform::fold::Fold;
+use crate::model::{AnimatedModel, Model, Stay};
+use glm::Vec3;
 
 const SCALE: f32 = 1.0 / 297.0;
 const FOLD_FACTOR: f32 = 0.97;
@@ -61,22 +62,28 @@ static INDEXES: &[(u8, u8, u8)] = &[
     (1, 12, 4),
 ];
 
-struct Step {
-    duration: f32,
-    transformation: Fold,
-    /// Lines to appear during this step
-    lines: &'static [(u8, u8)],
+fn create_static_plane() -> Model {
+    Model {
+        vertices: POINTS
+            .iter()
+            .copied()
+            .map(|(x, y)| Vec3::new(x, y, 0.0) * SCALE + Vec3::new(0.0, -0.5, 0.0))
+            .collect(),
+        triangles: INDEXES.iter().copied().collect(),
+        lines: vec![],
+    }
 }
 
-static STEPS: &[Step] = &[
-    Step {
-        duration: 1.0,
-        transformation: Fold::new(
+fn create_animated_plane() -> impl AnimatedModel {
+    let model = create_static_plane();
+    let model = model.animate(
+        1.0,
+        Fold::new(
             (0, 4),
             BitSet::with_bits(&[2, 3, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]),
             PI * 0.5 * FOLD_FACTOR,
-        ),
-        lines: &[
+        )
+        .add_lines(vec![
             (0, 10),
             (10, 1),
             (1, 4),
@@ -91,146 +98,95 @@ static STEPS: &[Step] = &[
             (3, 16),
             (16, 6),
             (6, 20),
-        ],
-    },
-    Step {
-        duration: 1.0,
-        transformation: Fold::new(
+        ]),
+    );
+    let model = model.animate(
+        1.0,
+        Fold::new(
             (0, 4),
             BitSet::with_bits(&[
                 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
             ]),
             -PI * 0.5 * FOLD_FACTOR,
         ),
-        lines: &[],
-    },
-    Step {
-        duration: 1.0,
-        transformation: Fold::new((0, 3), BitSet::with_bits(&[8, 2, 14, 19, 18]), PI),
-        lines: &[(0, 9), (9, 13), (13, 7), (7, 17), (17, 3)],
-    },
-    Step {
-        duration: 1.0,
-        transformation: Fold::new(
+    );
+    let model = model.animate(
+        1.0,
+        Fold::new((0, 3), BitSet::with_bits(&[8, 2, 14, 19, 18]), PI).add_lines(vec![
+            (0, 9),
+            (9, 13),
+            (13, 7),
+            (7, 17),
+            (17, 3),
+        ]),
+    );
+    let model = model.animate(
+        1.0,
+        Fold::new(
             (1, 3),
             BitSet::with_bits(&[0, 8, 2, 14, 19, 18, 9, 13, 7, 17, 10]),
             PI,
-        ),
-        lines: &[(1, 11), (11, 5), (5, 15), (15, 3)],
-    },
-    Step {
-        duration: 1.0,
-        transformation: Fold::new((5, 6), BitSet::with_bits(&[18, 17, 3, 15, 16]), PI),
-        lines: &[(5, 6), (5, 7), (7, 19)],
-    },
-    Step {
-        duration: 1.0,
-        transformation: Fold::new((9, 10), BitSet::with_bits(&[0]), PI),
-        lines: &[(9, 10), (9, 8)],
-    },
-    Step {
-        duration: 1.0,
-        transformation: Fold::new(
+        )
+        .add_lines(vec![(1, 11), (11, 5), (5, 15), (15, 3)]),
+    );
+    let model = model.animate(
+        0.25,
+        Stay::new().shift(Vec3::new(0.0, -210.0 * 0.5 * 0.5 / 297.0, 0.0)),
+    );
+    let model = model.animate(
+        1.0,
+        Fold::new((5, 6), BitSet::with_bits(&[18, 17, 3, 15, 16]), PI).add_lines(vec![
+            (5, 6),
+            (5, 7),
+            (7, 19),
+        ]),
+    );
+    let model = model.animate(
+        1.0,
+        Fold::new((9, 10), BitSet::with_bits(&[0]), PI).add_lines(vec![(9, 10), (9, 8)]),
+    );
+    let model = model.animate(
+        1.0,
+        Fold::new(
             (1, 4),
             BitSet::with_bits(&[2, 3, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]),
             -PI * 0.5 * FOLD_FACTOR,
         ),
-        lines: &[],
-    },
-    Step {
-        duration: 1.0,
-        transformation: Fold::new((11, 12), BitSet::with_bits(&[5, 7, 19, 6, 20]), PI * 0.5),
-        lines: &[(11, 12), (11, 13), (13, 14), (15, 16), (15, 17), (17, 18)],
-    },
-    Step {
-        duration: 3.0,
-        transformation: Fold::new((1, 4), BitSet::with_bits(&[]), 0.0),
-        lines: &[],
-    },
-];
+    );
+    let model = model.animate(
+        1.0,
+        Fold::new((11, 12), BitSet::with_bits(&[5, 7, 19, 6, 20]), PI * 0.5).add_lines(vec![
+            (11, 12),
+            (11, 13),
+            (13, 14),
+            (15, 16),
+            (15, 17),
+            (17, 18),
+        ]),
+    );
+    let model = model.stay(3.0);
 
-pub struct PlanePrimitives {
-    pub lines: Vec<(Vec3, Vec3, f32)>,
-    pub triangles: Vec<(Vec3, Vec3, Vec3)>,
+    model
 }
 
-#[derive(Clone, Debug)]
 pub struct PlaneGeometry {
-    total_duration: f32,
-    /// Input points for every step
-    input_points: Vec<Vec<Vec3>>,
+    model: Box<dyn AnimatedModel>,
 }
 
 /// Animated foldable plane geometry
 impl PlaneGeometry {
     pub fn new() -> PlaneGeometry {
         PlaneGeometry {
-            total_duration: STEPS
-                .iter()
-                .map(|s| s.duration)
-                .reduce(|r, v| r + v)
-                .unwrap_or(0.0),
-            input_points: {
-                let mut points: Vec<Vec<Vec3>> = Vec::with_capacity(STEPS.len());
-                let offset = Vec3::new(0.0, -0.5, 0.0);
-                for i in 0..STEPS.len() {
-                    points.push(if i == 0 {
-                        POINTS
-                            .iter()
-                            .map(|(x, y)| Vec3::new(*x, *y, 0.0) * SCALE + offset)
-                            .collect()
-                    } else {
-                        STEPS[i - 1].transformation.apply(&points[i - 1], 1.0)
-                    });
-                }
-                points
-            },
+            model: Box::new(create_animated_plane()),
         }
     }
 
     /// Get points for time from 0.0 to 1.0
-    pub fn get_primitives(&self, t: f32) -> PlanePrimitives {
-        let mut time = t.clamp(0.0, 1.0) * self.total_duration;
+    pub fn get_model(&self, t: f32) -> Model {
+        let time = t.clamp(0.0, 1.0) * self.model.duration();
+        let model = self.model.get_model(time);
+        let model = model.clone().merge(model.flip_x());
 
-        let mut index: usize = 0;
-        for (i, s) in STEPS.iter().enumerate() {
-            index = i;
-            if time <= s.duration || i == STEPS.len() - 1 {
-                break;
-            } else {
-                time -= s.duration;
-            }
-        }
-
-        let step = &STEPS[index];
-        let m = time / step.duration;
-
-        let points = step.transformation.apply(&self.input_points[index], m);
-
-        let lines_opacity = t;
-
-        PlanePrimitives {
-            lines: (0..index)
-                .flat_map(|i| STEPS[i].lines.iter().copied().map(|(p1, p2)| (p1, p2, 1.0)))
-                .chain(
-                    step.lines
-                        .iter()
-                        .copied()
-                        .map(|(p1, p2)| (p1, p2, lines_opacity)),
-                )
-                .map(|(p1, p2, opacity)| (points[p1 as usize], points[p2 as usize], opacity))
-                .collect(),
-            triangles: INDEXES
-                .iter()
-                .copied()
-                .map(|(i1, i2, i3)| {
-                    (
-                        points[i1 as usize],
-                        points[i2 as usize],
-                        points[i3 as usize],
-                    )
-                })
-                .collect(),
-        }
+        model
     }
 }
