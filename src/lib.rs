@@ -2,14 +2,12 @@
 
 extern crate nalgebra_glm as glm;
 
-use std::f32::consts::PI;
-
 use glm::Vec3;
 use wasm_bindgen::prelude::*;
 use web_sys::HtmlCanvasElement;
 use webgl_rc::{Gl, GlError, Settings};
 
-use crate::camera::Camera;
+use crate::flight::Flight;
 use crate::plane_geometry::PlaneGeometry;
 use crate::plane_program::PlaneProgram;
 use crate::scene::Scene;
@@ -40,6 +38,7 @@ pub struct Plane {
     gl: Gl,
     plane_program: PlaneProgram,
     plane_geometry: PlaneGeometry,
+    flight: Flight,
 }
 
 #[wasm_bindgen]
@@ -54,23 +53,18 @@ impl Plane {
             gl,
             plane_program,
             plane_geometry,
+            flight: Flight::new(),
         })
     }
 
     pub fn render(&self, w: i32, h: i32, phase: f32) {
         let ratio = (w as f32) / (h as f32);
-        let scene = Scene::new(
-            Camera {
-                position: Vec3::new(0.0, 0.0, -3.0),
-                target: Vec3::new(0.0, 0.0, 0.0),
-                fov: 43.0 / (2.0 * PI),
-                width: 2.0,
-                height: 2.0 / ratio,
-                far: 100.0,
-                near: 0.01,
-            },
-            LIGHT_POSITION,
-        );
+        let frame = self.flight.get(phase);
+        let scene = Scene {
+            camera: frame.get_camera(ratio),
+            light_position: LIGHT_POSITION,
+            model_matrix: frame.get_model_matrix(),
+        };
 
         self.gl.apply(
             Gl::settings()
@@ -80,7 +74,7 @@ impl Plane {
             || {
                 self.gl.clear_buffers();
                 self.plane_program
-                    .draw(&scene, &self.plane_geometry.get_model(phase))
+                    .draw(&scene, &self.plane_geometry.get_model(frame.fold_phase))
             },
         );
     }

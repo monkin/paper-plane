@@ -16,7 +16,7 @@ console_error_panic_hook = "0.1.7"
 webgl-rc = { version = "0.1", features = ["nalgebra-glm"] }
 nalgebra-glm = "0.19"
 num-traits = "0.2"
-glissade = { version = "0.2.4", features = ["nalgebra"] }
+glissade = { version = "0.2.5", features = ["nalgebra"] }
 
 [profile.dev]
 opt-level = 0

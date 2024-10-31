@@ -164,7 +164,6 @@ fn create_animated_plane() -> impl AnimatedModel {
             (17, 18),
         ]),
     );
-    let model = model.stay(3.0);
 
     model
 }

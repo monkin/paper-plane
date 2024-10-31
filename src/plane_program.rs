@@ -70,6 +70,7 @@ impl PlaneProgram {
 
     pub fn draw(&self, scene: &Scene, model: &Model) {
         let camera = &scene.camera;
+        let plane_matrix = scene.model_matrix * camera.get_matrix();
         let light_position = scene.light_position;
 
         let triangles: Vec<_> = model
@@ -129,7 +130,7 @@ impl PlaneProgram {
                 self.triangles_program.draw_arrays(
                     PrimitiveType::Triangles,
                     &TriangleUniforms {
-                        camera: camera.get_matrix(),
+                        camera: plane_matrix,
                         light_position,
                     },
                     &self.triangles_array,
@@ -148,7 +149,7 @@ impl PlaneProgram {
                 self.lines_program.draw_arrays(
                     PrimitiveType::Lines,
                     &LineUniforms {
-                        camera: camera.get_matrix(),
+                        camera: plane_matrix,
                     },
                     &self.lines_array,
                 );
