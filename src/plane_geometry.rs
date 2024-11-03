@@ -131,7 +131,7 @@ fn create_animated_plane() -> impl AnimatedModel {
     );
     let model = model.animate(
         0.25,
-        Stay::new().shift(Vec3::new(0.0, -210.0 * 0.5 * 0.5 / 297.0, 0.0)),
+        Stay::new().shift_all(Vec3::new(0.0, -210.0 * 0.5 * 0.5 / 297.0, 0.0)),
     );
     let model = model.animate(
         1.0,
@@ -151,18 +151,21 @@ fn create_animated_plane() -> impl AnimatedModel {
             (1, 4),
             BitSet::with_bits(&[2, 3, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]),
             -PI * 0.5 * FOLD_FACTOR,
-        ),
+        )
+        .shift(Vec3::new(0.0, 0.0, -0.003), BitSet::with_bits(&[0])),
     );
     let model = model.animate(
         1.0,
-        Fold::new((11, 12), BitSet::with_bits(&[5, 7, 19, 6, 20]), PI * 0.5).add_lines(vec![
-            (11, 12),
-            (11, 13),
-            (13, 14),
-            (15, 16),
-            (15, 17),
-            (17, 18),
-        ]),
+        Fold::new((11, 12), BitSet::with_bits(&[5, 7, 19, 6, 20]), PI * 0.5)
+            .add_lines(vec![
+                (11, 12),
+                (11, 13),
+                (13, 14),
+                (15, 16),
+                (15, 17),
+                (17, 18),
+            ])
+            .shift(Vec3::new(0.0, 0.0, 0.015), BitSet::with_bits(&[4, 12])),
     );
 
     model

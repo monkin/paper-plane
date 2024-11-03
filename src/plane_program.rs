@@ -70,17 +70,24 @@ impl PlaneProgram {
 
     pub fn draw(&self, scene: &Scene, model: &Model) {
         let camera = &scene.camera;
-        let plane_matrix = scene.model_matrix * camera.get_matrix();
+        let plane_matrix = camera.get_projection_matrix() * camera.get_view_matrix();
         let light_position = scene.light_position;
+
+        let vertices: Vec<_> = model
+            .vertices
+            .iter()
+            .map(|v| scene.model_matrix * v.push(1.0))
+            .map(|v| v.xyz())
+            .collect();
 
         let triangles: Vec<_> = model
             .triangles
             .iter()
             .copied()
             .map(|(a, b, c)| {
-                let p1 = model.vertices[a as usize];
-                let p2 = model.vertices[b as usize];
-                let p3 = model.vertices[c as usize];
+                let p1 = vertices[a as usize];
+                let p2 = vertices[b as usize];
+                let p3 = vertices[c as usize];
                 (p1, p2, p3)
             })
             .flat_map(|(p1, p2, p3)| {
@@ -109,11 +116,11 @@ impl PlaneProgram {
             .copied()
             .flat_map(|(p1, p2, a)| {
                 once(LineVertex {
-                    position: model.vertices[p1 as usize],
+                    position: vertices[p1 as usize],
                     opacity: a,
                 })
                 .chain(once(LineVertex {
-                    position: model.vertices[p2 as usize],
+                    position: vertices[p2 as usize],
                     opacity: a,
                 }))
             })

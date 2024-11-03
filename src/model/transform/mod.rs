@@ -1,5 +1,6 @@
 mod add_lines;
 pub mod fold;
+mod shift;
 mod shift_all;
 mod stay;
 mod transform;

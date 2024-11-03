@@ -20,13 +20,14 @@ mod flight;
 mod mix;
 mod model;
 mod plane_geometry;
+mod plane_orientation;
 mod plane_program;
 mod scene;
 mod utils;
 
 const DURATION: f64 = 6000.0;
 
-const LIGHT_POSITION: Vec3 = Vec3::new(2.0, 5.0, -5.0);
+const LIGHT_POSITION: Vec3 = Vec3::new(3.0, 0.5, -3.0);
 
 #[wasm_bindgen(start)]
 pub fn start() {

@@ -1,6 +1,7 @@
 use crate::bit_set::BitSet;
 use crate::model::transform::add_lines::AddLines;
 use crate::model::transform::fold::Fold;
+use crate::model::transform::shift::Shift;
 use crate::model::transform::shift_all::ShiftAll;
 use crate::model::transform::transform_parallel::TransformParallel;
 use crate::model::Model;
@@ -15,11 +16,18 @@ pub trait Transform {
         TransformParallel::new(self, Fold::new(line, points, angle))
     }
 
-    fn shift(self, shift: Vec3) -> TransformParallel<Self, ShiftAll>
+    fn shift_all(self, shift: Vec3) -> TransformParallel<Self, ShiftAll>
     where
         Self: Sized,
     {
         TransformParallel::new(self, ShiftAll::new(shift))
+    }
+
+    fn shift(self, shift: Vec3, points: BitSet) -> TransformParallel<Self, Shift>
+    where
+        Self: Sized,
+    {
+        TransformParallel::new(self, Shift::new(shift, points))
     }
 
     fn add_lines(self, lines: Vec<(u8, u8)>) -> TransformParallel<Self, AddLines>
