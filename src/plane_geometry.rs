@@ -165,7 +165,7 @@ fn create_animated_plane() -> impl AnimatedModel {
                 (15, 17),
                 (17, 18),
             ])
-            .shift(Vec3::new(0.0, 0.0, 0.015), BitSet::with_bits(&[4, 12])),
+            .shift(Vec3::new(0.0, 0.0, 0.015), BitSet::with_bits(&[4, 12, 20])),
     );
 
     model

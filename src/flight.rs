@@ -20,7 +20,7 @@ impl ControlPoint {
             fov: self.camera_fov.to_radians(),
             width: ratio,
             height: 1.0,
-            far: 100.0,
+            far: 1000.0,
             near: 0.01,
         }
     }
@@ -28,10 +28,23 @@ impl ControlPoint {
     pub fn get_model_matrix(&self) -> Mat4 {
         translation(&self.plane_position) * self.plane_orientation.get_matrix()
     }
+
+    pub fn with_position(
+        plane_position: Vec3,
+        plane_orientation: PlaneOrientation,
+    ) -> ControlPoint {
+        ControlPoint {
+            plane_position,
+            plane_orientation,
+            camera_position: DEFAULT_CAMERA_POSITION,
+            camera_fov: DEFAULT_FOV,
+            fold_phase: 1.0,
+        }
+    }
 }
 
 const DEFAULT_FOV: f32 = 40.0;
-const DEFAULT_CAMERA_POSITION: Vec3 = Vec3::new(0.0, 0.0, -2.33);
+const DEFAULT_CAMERA_POSITION: Vec3 = Vec3::new(0.0, 0.0, -2.25);
 
 fn direction_to_quat(direction: Vec3, up: Vec3) -> Quat {
     quat_look_at(&direction, &up)
@@ -71,7 +84,7 @@ impl Flight {
 
         let animation = {
             let duration = 10.0;
-            let rotation_duration = 4.0;
+            let rotation_duration = 3.0;
 
             let fold_phase = keyframes::from::<f32, f32>(0.0).go_to(1.0, duration);
             let direction = keyframes::from::<PlaneOrientation, f32>(PlaneOrientation::new(
@@ -106,7 +119,19 @@ impl Flight {
             animation.then(fold_animation)
         };
 
-        let animation = animation.stay(2.0);
+        let animation = animation.ease_to(
+            ControlPoint::with_position(
+                Vec3::new(-0.2, -0.2, -0.3),
+                PlaneOrientation::new(
+                    Vec3::new(0.5, 0.15, 1.0).normalize(),
+                    Vec3::new(0.0, -1.0, 0.0),
+                ),
+            ),
+            0.5,
+            Easing::QuarticOut,
+        );
+
+        let animation = animation.stay(4.0);
 
         let duration = animation.duration();
         let animation = animation.scale(1.0 / duration).repeat().run(0.0);
