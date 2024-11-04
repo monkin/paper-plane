@@ -1,12 +1,13 @@
 use crate::camera::Camera;
-use crate::plane_orientation::PlaneOrientation;
+use crate::orientation::Orientation;
+use crate::path::Path;
 use glissade::{keyframes, Animated, Easing, Keyframes, Mix};
 use glm::{quat_look_at, translation, Mat4, Quat, Vec3};
 
 #[derive(Clone, Copy, Debug, PartialEq, Mix)]
 pub struct ControlPoint {
     pub plane_position: Vec3,
-    pub plane_orientation: PlaneOrientation,
+    pub plane_orientation: Orientation,
     pub camera_position: Vec3,
     pub camera_fov: f32,
     pub fold_phase: f32,
@@ -29,10 +30,7 @@ impl ControlPoint {
         translation(&self.plane_position) * self.plane_orientation.get_matrix()
     }
 
-    pub fn with_position(
-        plane_position: Vec3,
-        plane_orientation: PlaneOrientation,
-    ) -> ControlPoint {
+    pub fn with_position(plane_position: Vec3, plane_orientation: Orientation) -> ControlPoint {
         ControlPoint {
             plane_position,
             plane_orientation,
@@ -58,10 +56,7 @@ impl Flight {
     pub fn new() -> Flight {
         let animation = keyframes::from(ControlPoint {
             plane_position: Vec3::new(0.0, 0.0, 0.0),
-            plane_orientation: PlaneOrientation::new(
-                Vec3::new(0.0, 1.0, 0.0),
-                Vec3::new(0.0, 0.0, 1.0),
-            ),
+            plane_orientation: Orientation::new(Vec3::new(0.0, 1.0, 0.0), Vec3::new(0.0, 0.0, 1.0)),
             camera_position: Vec3::new(0.0, 0.0, -1.0),
             camera_fov: 10.0,
             fold_phase: 0.0,
@@ -70,7 +65,7 @@ impl Flight {
         .ease_to(
             ControlPoint {
                 plane_position: Vec3::new(0.0, 0.0, 0.0),
-                plane_orientation: PlaneOrientation::new(
+                plane_orientation: Orientation::new(
                     Vec3::new(0.0, 1.0, 0.0),
                     Vec3::new(0.0, 0.0, 1.0),
                 ),
@@ -87,13 +82,13 @@ impl Flight {
             let rotation_duration = 3.0;
 
             let fold_phase = keyframes::from::<f32, f32>(0.0).go_to(1.0, duration);
-            let direction = keyframes::from::<PlaneOrientation, f32>(PlaneOrientation::new(
+            let direction = keyframes::from::<Orientation, f32>(Orientation::new(
                 Vec3::new(0.0, 1.0, 0.0),
                 Vec3::new(0.0, 0.0, -1.0),
             ))
             .stay(duration - rotation_duration)
             .ease_to(
-                PlaneOrientation::new(
+                Orientation::new(
                     Vec3::new(0.5, 0.0, 1.0).normalize(),
                     Vec3::new(0.0, -1.0, 0.0),
                 ),
@@ -122,7 +117,7 @@ impl Flight {
         let animation = animation.ease_to(
             ControlPoint::with_position(
                 Vec3::new(-0.2, -0.2, -0.3),
-                PlaneOrientation::new(
+                Orientation::new(
                     Vec3::new(0.5, 0.15, 1.0).normalize(),
                     Vec3::new(0.0, -1.0, 0.0),
                 ),
@@ -130,6 +125,24 @@ impl Flight {
             0.5,
             Easing::QuarticOut,
         );
+
+        let animation = {
+            let mut path = Path::new();
+
+            let initial_position = Vec3::new(-0.2, -0.2, -0.3);
+            let initial_direction = Vec3::new(0.5, 0.15, 1.0).normalize();
+
+            path.go_to(initial_position);
+            path.go_to(initial_position + initial_direction * 2.0);
+            path.go_to(Vec3::new(2.0, 2.0, 4.0));
+            path.go_to(Vec3::new(-2.0, -1.0, 3.0));
+            path.go_to(Vec3::new(0.0, 0.0, -0.25));
+
+            let path_animation = keyframes::poly(path.get_points(), 5.0, Easing::Linear)
+                .map(|point| ControlPoint::with_position(point.position, point.orientation()));
+
+            animation.then(path_animation)
+        };
 
         let animation = animation.stay(4.0);
 

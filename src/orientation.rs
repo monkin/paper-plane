@@ -3,21 +3,21 @@ use glm::{quat_inverse, quat_look_at, quat_slerp, quat_to_mat4, rotate, scale, M
 use std::f32::consts::PI;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub struct PlaneOrientation {
+pub struct Orientation {
     quat: Quat,
 }
 
-impl Default for PlaneOrientation {
+impl Default for Orientation {
     fn default() -> Self {
-        PlaneOrientation {
+        Orientation {
             quat: Quat::identity(),
         }
     }
 }
 
-impl PlaneOrientation {
-    pub fn new(direction: Vec3, up: Vec3) -> PlaneOrientation {
-        PlaneOrientation {
+impl Orientation {
+    pub fn new(direction: Vec3, up: Vec3) -> Orientation {
+        Orientation {
             quat: quat_inverse(&quat_look_at(&direction, &up)),
         }
     }
@@ -34,9 +34,9 @@ impl PlaneOrientation {
     }
 }
 
-impl Mix for PlaneOrientation {
+impl Mix for Orientation {
     fn mix(self, other: Self, t: f32) -> Self {
-        PlaneOrientation {
+        Orientation {
             quat: quat_slerp(&self.quat, &other.quat, t),
         }
     }
