@@ -133,18 +133,25 @@ impl Flight {
             let initial_direction = Vec3::new(0.5, 0.15, 1.0).normalize();
 
             path.go_to(initial_position);
-            path.go_to(initial_position + initial_direction * 2.0);
-            path.go_to(Vec3::new(2.0, 2.0, 4.0));
-            path.go_to(Vec3::new(-2.0, -1.0, 3.0));
-            path.go_to(Vec3::new(0.0, 0.0, -0.25));
+            path.go_to(initial_position + initial_direction * 1.5);
+            path.go_to(Vec3::new(1.0, 0.0, 2.5));
+            path.go_to(Vec3::new(0.0, 0.0, 4.0));
+            path.go_to(Vec3::new(-1.0, 0.0, 3.5));
+            path.go_to(Vec3::new(-1.5, 0.0, 2.0));
+            path.go_to(Vec3::new(0.0, 0.0, 0.0));
 
-            let path_animation = keyframes::poly(path.get_points(), 5.0, Easing::Linear)
+            path.go_to(Vec3::new(2.0, 0.0, 2.5));
+            path.go_to(Vec3::new(0.0, 0.0, 4.0));
+            path.go_to(Vec3::new(-1.5, 0.0, 3.0));
+            //path.go_to(Vec3::new(-1.5, 0.0, 2.0));
+            path.go_to(Vec3::new(0.0, 0.25, -1.0));
+            path.go_to(Vec3::new(1.0, 0.33, -3.0));
+
+            let path_animation = keyframes::poly(path.get_points(), 10.0, Easing::Linear)
                 .map(|point| ControlPoint::with_position(point.position, point.orientation()));
 
             animation.then(path_animation)
         };
-
-        let animation = animation.stay(4.0);
 
         let duration = animation.duration();
         let animation = animation.scale(1.0 / duration).repeat().run(0.0);
