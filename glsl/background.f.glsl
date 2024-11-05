@@ -16,8 +16,8 @@ void main() {
     fract(sin(dot(xy, vec2(43.332, 93.532))) * 43758.5453)
     ) * (1.0 / 255.0);
 
-    vec3 color1 = pow(vec3(235, 237, 255) * 0.85 / 255.0, vec3(2.2));
-    vec3 color2 = pow(vec3(235, 237, 255) / 255.0, vec3(2.2));
+    vec3 color1 = pow(vec3(196, 229, 249) * 0.85 / 255.0, vec3(2.2));
+    vec3 color2 = pow(vec3(196, 229, 255) / 255.0, vec3(2.2));
     vec3 color = pow(mix(color1, color2, ease(v_y)), vec3(1.0 / 2.2)) + noise;
     gl_FragColor = vec4(color, 1);
 }

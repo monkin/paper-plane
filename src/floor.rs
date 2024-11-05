@@ -49,12 +49,11 @@ impl Floor {
     }
 
     pub fn render(&self, camera: Mat4) {
-        let v = Vec3::new(0.0, 0.0, 2.0);
         let points = [
-            Point::new(Vec3::new(-3.0, -1.5, -3.0) + v, Vec2::new(-1.0, -1.0)),
-            Point::new(Vec3::new(3.0, -1.5, -3.0) + v, Vec2::new(1.0, -1.0)),
-            Point::new(Vec3::new(3.0, -1.5, 3.0) + v, Vec2::new(1.0, 1.0)),
-            Point::new(Vec3::new(-3.0, -1.5, 3.0) + v, Vec2::new(-1.0, 1.0)),
+            Point::new(Vec3::new(-5.0, -1.5, -5.0), Vec2::new(-1.0, -1.0)),
+            Point::new(Vec3::new(5.0, -1.5, -5.0), Vec2::new(1.0, -1.0)),
+            Point::new(Vec3::new(5.0, -1.5, 5.0), Vec2::new(1.0, 1.0)),
+            Point::new(Vec3::new(-5.0, -1.5, 5.0), Vec2::new(-1.0, 1.0)),
         ];
 
         self.points.set_content(&points, BufferUsage::Dynamic);

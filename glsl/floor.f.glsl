@@ -2,7 +2,23 @@ precision mediump float;
 
 varying vec2 v_texture;
 
+float ease(float t) {
+    float p = 2.0 * t * t;
+    return t < 0.5 ? p : -p + (4.0 * t) - 1.0;
+}
+
 void main() {
-    float opacity = pow(max(1.0 - length(v_texture), 0.0), 1.0 / 2.2);
-    gl_FragColor = vec4(1.0); // vec4(0.0, 0.0, 0.0, opacity);
+    vec2 xy = gl_FragCoord.xy;
+
+    vec3 color_noise = vec3(
+    fract(sin(dot(xy, vec2(12.9898, 78.233))) * 43758.5453),
+    fract(sin(dot(xy, vec2(93.9898, 67.345))) * 43758.5453),
+    fract(sin(dot(xy, vec2(43.332, 93.532))) * 43758.5453)
+    ) * (2.0 / 255.0);
+
+    vec4 color = vec4(pow(vec3(196, 229, 249) * 0.75 / 255.0, vec3(2.2)) + color_noise, 1.0);
+
+    float opacity_noise = fract(sin(dot(xy, vec2(12.9898, 67.345))) * 43758.5453) * (2.0 / 255.0);
+    float opacity = ease(max(1.0 - length(v_texture), 0.0)) * 0.5 + opacity_noise;
+    gl_FragColor = color * opacity;
 }
