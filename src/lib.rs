@@ -2,8 +2,10 @@
 
 extern crate nalgebra_glm as glm;
 
+use crate::background::Background;
 use crate::cover::Cover;
 use crate::flight::Flight;
+use crate::floor::Floor;
 use crate::plane_geometry::PlaneGeometry;
 use crate::plane_program::PlaneProgram;
 use crate::scene::Scene;
@@ -13,11 +15,13 @@ use wasm_bindgen::prelude::*;
 use web_sys::HtmlCanvasElement;
 use webgl_rc::{Gl, GlError, Settings};
 
+mod background;
 mod bezier;
 mod bit_set;
 mod camera;
 mod cover;
 mod flight;
+mod floor;
 mod model;
 mod orientation;
 mod path;
@@ -42,6 +46,8 @@ pub struct Plane {
     plane_program: PlaneProgram,
     plane_geometry: PlaneGeometry,
     cover: Cover,
+    background: Background,
+    floor: Floor,
     flight: Flight,
 }
 
@@ -53,13 +59,18 @@ impl Plane {
         let gl = Gl::new(canvas)?;
         let plane_program = PlaneProgram::new(gl.clone())?;
         let cover = Cover::new(gl.clone())?;
+        let background = Background::new(gl.clone())?;
+        let floor = Floor::new(gl.clone())?;
+        let flight = Flight::new();
 
         Ok(Plane {
             gl,
             plane_program,
             plane_geometry,
             cover,
-            flight: Flight::new(),
+            background,
+            floor,
+            flight,
         })
     }
 
@@ -78,7 +89,9 @@ impl Plane {
                 .clear_depth(1.0)
                 .viewport(0, 0, w, h),
             || {
-                self.gl.clear_buffers();
+                self.background.render();
+                self.floor
+                    .render(scene.camera.get_projection_matrix() * scene.camera.get_view_matrix());
                 self.plane_program
                     .draw(&scene, &self.plane_geometry.get_model(frame.fold_phase));
                 self.cover.render(frame.cover_opacity);

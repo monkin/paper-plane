@@ -1,6 +1,6 @@
 use crate::orientation::Orientation;
 use glissade::{Distance, Mix};
-use glm::{distance, lerp, slerp, Vec3};
+use glm::{distance, slerp, Vec3};
 use std::iter::once;
 
 pub struct Path {
@@ -97,12 +97,12 @@ impl Path {
                         let d = distance(&p1.position, &p4.position) * 0.25;
                         let p2 = PathPoint {
                             position: p1.position + p1.direction * d,
-                            direction: lerp(&p1.direction, &p4.direction, 0.25).normalize(),
+                            direction: slerp(&p1.direction, &p4.direction, 0.25).normalize(),
                             up: slerp(&p1.up, &p4.up, 0.25),
                         };
                         let p3 = PathPoint {
                             position: p4.position - p4.direction * d,
-                            direction: lerp(&p1.direction, &p4.direction, 0.75).normalize(),
+                            direction: slerp(&p1.direction, &p4.direction, 0.75).normalize(),
                             up: slerp(&p1.up, &p4.up, 0.75),
                         };
 
