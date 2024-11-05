@@ -1,6 +1,7 @@
 use crate::camera::Camera;
 use crate::orientation::Orientation;
 use crate::path::Path;
+use crate::smooth::smooth;
 use glissade::{keyframes, Animated, Easing, Keyframes, Mix};
 use glm::{quat_look_at, translation, Mat4, Quat, Vec3};
 
@@ -11,6 +12,7 @@ pub struct ControlPoint {
     pub camera_position: Vec3,
     pub camera_fov: f32,
     pub fold_phase: f32,
+    pub cover_opacity: f32,
 }
 
 impl ControlPoint {
@@ -37,6 +39,7 @@ impl ControlPoint {
             camera_position: DEFAULT_CAMERA_POSITION,
             camera_fov: DEFAULT_FOV,
             fold_phase: 1.0,
+            cover_opacity: 0.0,
         }
     }
 }
@@ -60,8 +63,23 @@ impl Flight {
             camera_position: Vec3::new(0.0, 0.0, -1.0),
             camera_fov: 10.0,
             fold_phase: 0.0,
+            cover_opacity: 1.0,
         })
-        .stay(0.5)
+        .ease_to(
+            ControlPoint {
+                plane_position: Vec3::new(0.0, 0.0, 0.0),
+                plane_orientation: Orientation::new(
+                    Vec3::new(0.0, 1.0, 0.0),
+                    Vec3::new(0.0, 0.0, 1.0),
+                ),
+                camera_position: Vec3::new(0.0, 0.0, -1.0),
+                camera_fov: 10.0,
+                fold_phase: 0.0,
+                cover_opacity: 0.0,
+            },
+            1.0,
+            Easing::QuadraticInOut,
+        )
         .ease_to(
             ControlPoint {
                 plane_position: Vec3::new(0.0, 0.0, 0.0),
@@ -72,6 +90,7 @@ impl Flight {
                 camera_position: DEFAULT_CAMERA_POSITION,
                 camera_fov: DEFAULT_FOV,
                 fold_phase: 0.0,
+                cover_opacity: 0.0,
             },
             1.0,
             Easing::QuadraticInOut,
@@ -108,6 +127,7 @@ impl Flight {
                     camera_position: DEFAULT_CAMERA_POSITION,
                     camera_fov: DEFAULT_FOV,
                     plane_position,
+                    cover_opacity: 0.0,
                 },
             );
 
@@ -134,21 +154,33 @@ impl Flight {
 
             path.go_to(initial_position);
             path.go_to(initial_position + initial_direction * 1.5);
-            path.go_to(Vec3::new(1.0, 0.0, 2.5));
-            path.go_to(Vec3::new(0.0, 0.0, 4.0));
-            path.go_to(Vec3::new(-1.0, 0.0, 3.5));
-            path.go_to(Vec3::new(-1.5, 0.0, 2.0));
+            path.go_to(Vec3::new(1.0, -0.3, 2.5));
+            path.go_to(Vec3::new(0.0, -0.5, 4.0));
+            path.go_to(Vec3::new(-1.0, -0.5, 3.5));
+            path.go_to(Vec3::new(-1.5, -0.2, 2.0));
             path.go_to(Vec3::new(0.0, 0.0, 0.0));
 
-            path.go_to(Vec3::new(2.0, 0.0, 2.5));
-            path.go_to(Vec3::new(0.0, 0.0, 4.0));
-            path.go_to(Vec3::new(-1.5, 0.0, 3.0));
-            //path.go_to(Vec3::new(-1.5, 0.0, 2.0));
-            path.go_to(Vec3::new(0.0, 0.25, -1.0));
-            path.go_to(Vec3::new(1.0, 0.33, -3.0));
+            path.go_to(Vec3::new(2.0, 0.2, 2.5));
+            path.go_to(Vec3::new(0.0, 0.5, 4.0));
+            path.go_to(Vec3::new(-1.5, 0.4, 3.0));
+            path.go_to(Vec3::new(0.5, 0.25, -1.0));
+            path.go_to(Vec3::new(2.0, 0.1, -3.0));
 
-            let path_animation = keyframes::poly(path.get_points(), 10.0, Easing::Linear)
-                .map(|point| ControlPoint::with_position(point.position, point.orientation()));
+            let points = path.get_points();
+            let points = (0..16).fold(points, |points, _| smooth(points));
+
+            let poly = keyframes::poly(points, 10.0, Easing::Linear);
+
+            let cover = keyframes::from(0.0).stay(9.0).go_to(1.0, 1.0);
+
+            let path_animation = (poly, cover).map(|(point, cover_opacity)| ControlPoint {
+                plane_position: point.position,
+                plane_orientation: point.orientation(),
+                camera_position: DEFAULT_CAMERA_POSITION,
+                camera_fov: DEFAULT_FOV,
+                fold_phase: 1.0,
+                cover_opacity,
+            });
 
             animation.then(path_animation)
         };

@@ -117,11 +117,11 @@ impl PlaneProgram {
             .flat_map(|(p1, p2, a)| {
                 once(LineVertex {
                     position: vertices[p1 as usize],
-                    opacity: a,
+                    opacity: a * 0.5,
                 })
                 .chain(once(LineVertex {
                     position: vertices[p2 as usize],
-                    opacity: a,
+                    opacity: a * 0.5,
                 }))
             })
             .collect();

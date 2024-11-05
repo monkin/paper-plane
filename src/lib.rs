@@ -2,28 +2,29 @@
 
 extern crate nalgebra_glm as glm;
 
-use glm::Vec3;
-use wasm_bindgen::prelude::*;
-use web_sys::HtmlCanvasElement;
-use webgl_rc::{Gl, GlError, Settings};
-
+use crate::cover::Cover;
 use crate::flight::Flight;
 use crate::plane_geometry::PlaneGeometry;
 use crate::plane_program::PlaneProgram;
 use crate::scene::Scene;
 use crate::utils::set_panic_hook;
+use glm::Vec3;
+use wasm_bindgen::prelude::*;
+use web_sys::HtmlCanvasElement;
+use webgl_rc::{Gl, GlError, Settings};
 
 mod bezier;
 mod bit_set;
 mod camera;
+mod cover;
 mod flight;
-mod mix;
 mod model;
 mod orientation;
 mod path;
 mod plane_geometry;
 mod plane_program;
 mod scene;
+mod smooth;
 mod utils;
 
 const DURATION: f64 = 6000.0;
@@ -40,6 +41,7 @@ pub struct Plane {
     gl: Gl,
     plane_program: PlaneProgram,
     plane_geometry: PlaneGeometry,
+    cover: Cover,
     flight: Flight,
 }
 
@@ -50,11 +52,13 @@ impl Plane {
         let plane_geometry = PlaneGeometry::new();
         let gl = Gl::new(canvas)?;
         let plane_program = PlaneProgram::new(gl.clone())?;
+        let cover = Cover::new(gl.clone())?;
 
         Ok(Plane {
             gl,
             plane_program,
             plane_geometry,
+            cover,
             flight: Flight::new(),
         })
     }
@@ -76,7 +80,8 @@ impl Plane {
             || {
                 self.gl.clear_buffers();
                 self.plane_program
-                    .draw(&scene, &self.plane_geometry.get_model(frame.fold_phase))
+                    .draw(&scene, &self.plane_geometry.get_model(frame.fold_phase));
+                self.cover.render(frame.cover_opacity);
             },
         );
     }

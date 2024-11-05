@@ -6,7 +6,7 @@ varying vec3 v_normal;
 
 void main() {
     float light = abs(dot(normalize(u_light_position - v_position), v_normal));
-    vec3 color = vec3(pow(0.62 + 0.38 * light, 1.0 / 2.2));
+    vec3 color = vec3(pow(0.55 + 0.35 * light, 1.0 / 2.2));
 
     gl_FragColor = vec4(color, 1);
 }

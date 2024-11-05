@@ -36,7 +36,7 @@ impl PathPoint {
     }
 }
 
-const BEZIER_STEPS: usize = 16;
+const BEZIER_STEPS: usize = 48;
 
 impl Path {
     pub fn new() -> Self {
@@ -94,16 +94,16 @@ impl Path {
                 (0..self.points.len() - 1)
                     .map(|i| (self.point_at(i), self.point_at(i + 1)))
                     .flat_map(|(p1, p4)| {
-                        let d = distance(&p1.position, &p4.position) * 0.33;
+                        let d = distance(&p1.position, &p4.position) * 0.25;
                         let p2 = PathPoint {
                             position: p1.position + p1.direction * d,
-                            direction: lerp(&p1.direction, &p4.direction, 0.33).normalize(),
-                            up: slerp(&p1.up, &p4.up, 0.33),
+                            direction: lerp(&p1.direction, &p4.direction, 0.25).normalize(),
+                            up: slerp(&p1.up, &p4.up, 0.25),
                         };
                         let p3 = PathPoint {
                             position: p4.position - p4.direction * d,
-                            direction: lerp(&p1.direction, &p4.direction, 0.66).normalize(),
-                            up: slerp(&p1.up, &p4.up, 0.66),
+                            direction: lerp(&p1.direction, &p4.direction, 0.75).normalize(),
+                            up: slerp(&p1.up, &p4.up, 0.75),
                         };
 
                         (1..=BEZIER_STEPS).map(move |j| {

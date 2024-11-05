@@ -4,6 +4,7 @@ use crate::model::transform::fold::Fold;
 use crate::model::transform::shift::Shift;
 use crate::model::transform::shift_all::ShiftAll;
 use crate::model::transform::transform_parallel::TransformParallel;
+use crate::model::transform::RotateX;
 use crate::model::Model;
 use glm::Vec3;
 
@@ -28,6 +29,13 @@ pub trait Transform {
         Self: Sized,
     {
         TransformParallel::new(self, Shift::new(shift, points))
+    }
+
+    fn rotate_x(self, angle: f32) -> TransformParallel<Self, RotateX>
+    where
+        Self: Sized,
+    {
+        TransformParallel::new(self, RotateX::new(angle))
     }
 
     fn add_lines(self, lines: Vec<(u8, u8)>) -> TransformParallel<Self, AddLines>

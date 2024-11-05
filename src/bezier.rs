@@ -1,18 +1,15 @@
+use glissade::Mix;
 use std::ops::Sub;
-
-use crate::mix::Mix;
 
 pub struct Bezier<T>(T, T, T, T)
 where
-    T: Mix + Clone + Copy,
-    T::Factor: Clone + Copy;
+    T: Mix + Clone + Copy;
 
 impl<T> Bezier<T>
 where
     T: Mix + Clone + Copy,
-    T::Factor: Clone + Copy,
 {
-    pub fn value_at(&self, t: T::Factor) -> T {
+    pub fn value_at(&self, t: f32) -> T {
         let v01 = self.0.mix(self.1, t);
         let v12 = self.1.mix(self.2, t);
         let v23 = self.2.mix(self.3, t);
@@ -23,7 +20,7 @@ where
         n1.mix(n2, t)
     }
 
-    pub fn direction_at(&self, t: T::Factor) -> T::Output
+    pub fn direction_at(&self, t: f32) -> T::Output
     where
         T: Sub<T>,
     {
