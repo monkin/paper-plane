@@ -18,6 +18,10 @@ void main() {
 
     vec3 color1 = pow(vec3(196, 229, 249) * 0.85 / 255.0, vec3(2.2));
     vec3 color2 = pow(vec3(196, 229, 255) / 255.0, vec3(2.2));
-    vec3 color = pow(mix(color1, color2, ease(v_y)), vec3(1.0 / 2.2)) + noise;
+    vec3 color = mix(
+        vec3(1.0),
+        pow(mix(color1, color2, ease(v_y)), vec3(1.0 / 2.2)),
+        vec3(pow(0.1 + ease(min((1.0 - v_y) * 5.0, 1.0)) * 0.9, 0.5))
+    ) + noise;
     gl_FragColor = vec4(color, 1);
 }
