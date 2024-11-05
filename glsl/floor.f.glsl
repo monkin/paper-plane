@@ -16,9 +16,9 @@ void main() {
     fract(sin(dot(xy, vec2(43.332, 93.532))) * 43758.5453)
     ) * (2.0 / 255.0);
 
-    vec4 color = vec4(pow(vec3(196, 229, 249) * 0.75 / 255.0, vec3(2.2)) + color_noise, 1.0);
+    vec4 color = vec4(pow(vec3(75, 172, 232) * 0.8 / 255.0, vec3(2.2)) + color_noise, 1.0);
 
     float opacity_noise = fract(sin(dot(xy, vec2(12.9898, 67.345))) * 43758.5453) * (2.0 / 255.0);
-    float opacity = ease(max(1.0 - length(v_texture), 0.0)) * 0.5 + opacity_noise;
+    float opacity = ease(max(1.0 - length(v_texture) + opacity_noise, 0.0)) * 0.6;
     gl_FragColor = color * opacity;
 }
