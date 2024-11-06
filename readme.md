@@ -1,4 +1,4 @@
-# Paper plane
+# Paper plane animation
 
 Made with Rust, WASM, and WebGL.
 
