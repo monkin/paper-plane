@@ -8,18 +8,6 @@ pub struct Model {
 }
 
 impl Model {
-    pub fn new(
-        vertices: Vec<Vec3>,
-        triangles: Vec<(u8, u8, u8)>,
-        lines: Vec<(u8, u8, f32)>,
-    ) -> Self {
-        Self {
-            vertices,
-            triangles,
-            lines,
-        }
-    }
-
     pub fn merge(self, other: Self) -> Model {
         let mut vertices = self.vertices;
         let mut triangles = self.triangles;
@@ -56,16 +44,6 @@ impl Model {
 
     pub fn flip_x(self) -> Self {
         let matrix = glm::scaling(&Vec3::new(-1.0, 1.0, 1.0));
-        self.transform(matrix)
-    }
-
-    pub fn flip_y(self) -> Self {
-        let matrix = glm::scaling(&Vec3::new(1.0, -1.0, 1.0));
-        self.transform(matrix)
-    }
-
-    pub fn flip_z(self) -> Self {
-        let matrix = glm::scaling(&Vec3::new(1.0, 1.0, -1.0));
         self.transform(matrix)
     }
 }

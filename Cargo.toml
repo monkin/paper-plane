@@ -3,20 +3,28 @@ name = "wasm-plane"
 version = "0.1.0"
 authors = ["Andrei Monkin <monkin.andrey@gmail.com>"]
 edition = "2018"
-license-file = "LICENSE_MIT"
-
-[lib]
-crate-type = ["cdylib", "rlib"]
+license-file = "LICENSE"
+publish = false
 
 [dependencies]
 wasm-bindgen = "0.2"
-web-sys = "0.3"
 js-sys = "0.3"
-console_error_panic_hook = "0.1.7"
+console_error_panic_hook = "0.1"
 webgl-rc = { version = "0.1", features = ["nalgebra-glm"] }
 nalgebra-glm = "0.19"
 num-traits = "0.2"
 glissade = { version = "0.2.5", features = ["nalgebra"] }
+
+[dependencies.web-sys]
+version = "0.3"
+features = [
+    "Window",
+    "Document",
+    "HtmlCanvasElement",
+]
+
+[dev-dependencies]
+trunk = "0.21"
 
 [profile.dev]
 opt-level = 0

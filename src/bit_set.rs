@@ -4,9 +4,6 @@ pub struct BitSet {
 }
 
 impl BitSet {
-    pub const fn new() -> BitSet {
-        BitSet { data: 0 }
-    }
     pub const fn with_bits(bits: &[u8]) -> BitSet {
         let mut data = 0u32;
         let mut i = 0;

@@ -7,7 +7,6 @@ mod stay;
 mod transform;
 mod transform_parallel;
 
-pub use fold::Fold;
 pub use rotate_x::RotateX;
 pub use stay::Stay;
 pub use transform::Transform;

@@ -1,5 +1,4 @@
 use crate::model::model::Model;
-use crate::model::transform::Stay;
 use crate::model::Transform;
 use glissade::Easing;
 
@@ -13,13 +12,6 @@ pub trait AnimatedModel {
         Self: Sized,
     {
         ModelTransformation::new(self, transformation, duration)
-    }
-
-    fn stay(self, duration: f32) -> ModelTransformation<Self, Stay>
-    where
-        Self: Sized,
-    {
-        self.animate(duration, Stay::new())
     }
 }
 
@@ -60,7 +52,7 @@ impl<M: AnimatedModel, T: Transform> AnimatedModel for ModelTransformation<M, T>
         if time < self.model.duration() {
             self.model.get_model(time)
         } else {
-            let t = ((time - self.model.duration()) / self.duration);
+            let t = (time - self.model.duration()) / self.duration;
             let t = t.clamp(0.0, 1.0);
             let t = Easing::QuadraticInOut.ease(t);
             self.transformation.apply(self.input.clone(), t)

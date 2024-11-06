@@ -1,0 +1,11 @@
+[build]
+dist = "dist"
+target = "index.html"
+release = true
+public_url = "./"
+filehash = false
+inject_scripts = true
+minify = "always"      # Control minification: can be one of: never, on_release, always
+
+[serve]
+port = 8080

@@ -1,7 +1,3 @@
-#![allow(dead_code)]
-
-extern crate nalgebra_glm as glm;
-
 use crate::background::Background;
 use crate::cover::Cover;
 use crate::flight::Flight;
@@ -9,38 +5,12 @@ use crate::floor::Floor;
 use crate::plane_geometry::PlaneGeometry;
 use crate::plane_program::PlaneProgram;
 use crate::scene::Scene;
-use crate::utils::set_panic_hook;
 use glm::Vec3;
-use wasm_bindgen::prelude::*;
 use web_sys::HtmlCanvasElement;
 use webgl_rc::{Gl, GlError, Settings};
 
-mod background;
-mod bezier;
-mod bit_set;
-mod camera;
-mod cover;
-mod flight;
-mod floor;
-mod model;
-mod orientation;
-mod path;
-mod plane_geometry;
-mod plane_program;
-mod scene;
-mod smooth;
-mod utils;
-
-const DURATION: f64 = 6000.0;
-
 const LIGHT_POSITION: Vec3 = Vec3::new(3.0, 0.5, -3.0);
 
-#[wasm_bindgen(start)]
-pub fn start() {
-    set_panic_hook();
-}
-
-#[wasm_bindgen]
 pub struct Plane {
     gl: Gl,
     plane_program: PlaneProgram,
@@ -51,9 +21,7 @@ pub struct Plane {
     flight: Flight,
 }
 
-#[wasm_bindgen]
 impl Plane {
-    #[wasm_bindgen(constructor, catch)]
     pub fn new(canvas: &HtmlCanvasElement) -> Result<Plane, GlError> {
         let plane_geometry = PlaneGeometry::new();
         let gl = Gl::new(canvas)?;

@@ -1,7 +1,6 @@
 use std::iter::once;
 
 use crate::model::Model;
-use crate::plane_geometry::PlaneGeometry;
 use crate::scene::Scene;
 use glm::{Mat4, Vec3};
 use webgl_rc::{
@@ -11,7 +10,6 @@ use webgl_rc::{
 
 pub struct PlaneProgram {
     gl: Gl,
-    geometry: PlaneGeometry,
     triangles_program: Program,
     lines_program: Program,
     lines_array: ItemsBuffer<LineVertex>,
@@ -41,11 +39,8 @@ struct TriangleVertex {
     normal: Vec3,
 }
 
-struct PlaneUniforms {}
-
 impl PlaneProgram {
     pub fn new(gl: Gl) -> Result<PlaneProgram, GlError> {
-        let geometry = PlaneGeometry::new();
         let lines_program = gl.program(
             load_glsl!("plane-line.f.glsl"),
             load_glsl!("plane-line.v.glsl"),
@@ -60,7 +55,6 @@ impl PlaneProgram {
 
         Ok(PlaneProgram {
             gl,
-            geometry,
             lines_program,
             triangles_program,
             lines_array,

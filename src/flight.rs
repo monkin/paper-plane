@@ -3,7 +3,7 @@ use crate::orientation::Orientation;
 use crate::path::Path;
 use crate::smooth::smooth;
 use glissade::{keyframes, Animated, Easing, Keyframes, Mix};
-use glm::{quat_look_at, translation, Mat4, Quat, Vec3};
+use glm::{translation, Mat4, Vec3};
 
 #[derive(Clone, Copy, Debug, PartialEq, Mix)]
 pub struct ControlPoint {
@@ -46,10 +46,6 @@ impl ControlPoint {
 
 const DEFAULT_FOV: f32 = 40.0;
 const DEFAULT_CAMERA_POSITION: Vec3 = Vec3::new(0.0, 0.0, -2.25);
-
-fn direction_to_quat(direction: Vec3, up: Vec3) -> Quat {
-    quat_look_at(&direction, &up)
-}
 
 pub struct Flight {
     animation: Box<dyn Animated<ControlPoint, f32>>,

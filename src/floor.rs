@@ -14,13 +14,6 @@ impl Point {
     pub fn new(position: Vec3, texture: Vec2) -> Self {
         Self { position, texture }
     }
-
-    pub fn transform(&self, matrix: &Mat4) -> Self {
-        Self {
-            position: (matrix * self.position.push(1.0)).xyz(),
-            texture: self.texture,
-        }
-    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Uniforms)]
@@ -38,7 +31,6 @@ impl Floor {
     pub fn new(gl: Gl) -> Result<Self, GlError> {
         let program = gl.program(load_glsl!("floor.f.glsl"), load_glsl!("floor.v.glsl"))?;
 
-        let v = Vec3::new(0.0, 0.0, 4.0);
         let points = ItemsBuffer::new(gl.clone(), &[], BufferUsage::Dynamic)?;
 
         Ok(Self {
